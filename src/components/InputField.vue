@@ -2,7 +2,11 @@
     import LockButton from "@/components/LockButton.vue"
     import NumberInput from "@/components/NumberInput.vue"
 
-    const { label, locked = false } = defineProps<{
+    const {
+        label,
+        locked = false,
+        roundDigits = 2,
+    } = defineProps<{
         /** Label to display next to the input field */
         label: string
         /** Whether the input field is locked (default false) */
@@ -11,6 +15,8 @@
         prefix?: string
         /** Postfix to display after the number */
         postfix?: string
+        /** Number of rounding digits for this field (default 2) */
+        roundDigits?: number
     }>()
 
     const emit = defineEmits<{
@@ -18,7 +24,7 @@
         (e: "request-lock"): void
     }>()
 
-    const value = defineModel<number>("value", { required: true })
+    const value = defineModel<number | null>("value", { required: true })
 </script>
 
 <template>
@@ -30,6 +36,7 @@
             :prefix="prefix"
             :postfix="postfix"
             :disabled="locked"
+            :round-digits="roundDigits"
         />
         <LockButton @click="emit('request-lock')" :locked="locked" />
     </div>

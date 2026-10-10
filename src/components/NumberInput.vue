@@ -6,6 +6,7 @@
         postfix = "",
         name,
         disabled = false,
+        roundDigits,
     } = defineProps<{
         /** Prefix to display before the number */
         prefix?: string
@@ -15,9 +16,11 @@
         name?: string
         /** Whether the input field is disabled */
         disabled?: boolean
+        /** Number of rounding digits for this field */
+        roundDigits: number
     }>()
 
-    const value = defineModel<number>({ default: 0 })
+    const value = defineModel<number | null>({ default: 0 })
     const text = ref("0")
 
     const { pause: pauseText, resume: resumeText } = watch(text, updateValue, {
@@ -39,6 +42,10 @@
         const newText = text.value
         pauseValue()
         const num = Number(newText)
+        if (newText == "-") {
+            value.value = null
+            return
+        }
         if (isNaN(num)) return
         value.value = num
         resumeValue()
@@ -50,8 +57,15 @@
     function updateText(): void {
         const newValue = value.value
         pauseText()
-        if (Number(text.value) == newValue) return
-        text.value = String(newValue)
+        if (
+            (newValue == null && text.value == "-") ||
+            Number(text.value) == newValue
+        ) {
+            resumeText()
+            return
+        }
+        if (newValue == null) text.value = "-"
+        else text.value = newValue.toFixed(roundDigits)
         resumeText()
     }
 
