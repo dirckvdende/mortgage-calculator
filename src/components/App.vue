@@ -1,6 +1,6 @@
 <script setup lang="ts">
     import { ref } from "vue"
-    import AppAnnuity from "./AppAnnuity.vue"
+    import AppAnnuity from "@/components/AppAnnuity.vue"
 
     const activePage = ref<"annuity" | "linear">("annuity")
 </script>

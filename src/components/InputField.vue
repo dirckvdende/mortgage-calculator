@@ -1,11 +1,16 @@
 <script setup lang="ts">
-    import LockButton from "./LockButton.vue"
+    import LockButton from "@/components/LockButton.vue"
+    import NumberInput from "@/components/NumberInput.vue"
 
     const { label, locked = false } = defineProps<{
         /** Label to display next to the input field */
         label: string
         /** Whether the input field is locked (default false) */
         locked?: boolean
+        /** Prefix to display before the number */
+        prefix?: string
+        /** Postfix to display after the number */
+        postfix?: string
     }>()
 
     const emit = defineEmits<{
@@ -19,11 +24,12 @@
 <template>
     <div :class="$style.container">
         <label :class="$style.label" :for="label">{{ label }}</label>
-        <input
-            type="number"
+        <NumberInput
             :name="label"
-            :class="$style.input"
             v-model="value"
+            :prefix="prefix"
+            :postfix="postfix"
+            :disabled="locked"
         />
         <LockButton @click="emit('request-lock')" :locked="locked" />
     </div>

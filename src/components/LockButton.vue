@@ -27,7 +27,10 @@
 </template>
 
 <style lang="scss" module>
+    @use "@/assets/colors";
+
     .button {
+        @extend %button;
         box-sizing: border-box;
         width: 2.5em;
         height: 2.5em;
@@ -35,8 +38,6 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        background-color: #eee;
-        color: #666;
         border: none;
         border-radius: 0.3em;
         cursor: pointer;
@@ -54,7 +55,6 @@
     }
 
     .button.locked {
-        background-color: #333;
-        color: white;
+        @extend %button-active;
     }
 </style>
