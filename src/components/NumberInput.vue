@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    import { ref, watch } from "vue"
+    import { onMounted, ref, watch } from "vue"
 
     const {
         prefix = "",
@@ -20,28 +20,42 @@
     const value = defineModel<number>({ default: 0 })
     const text = ref("0")
 
-    const { pause: pauseText, resume: resumeText } = watch(
-        text,
-        (text) => {
-            pauseValue()
-            const num = Number(text)
-            if (isNaN(num)) return
-            value.value = num
-            resumeValue()
-        },
-        { flush: "sync" },
-    )
+    const { pause: pauseText, resume: resumeText } = watch(text, updateValue, {
+        flush: "sync",
+    })
 
     const { pause: pauseValue, resume: resumeValue } = watch(
         value,
-        (value) => {
-            pauseText()
-            if (Number(text.value) == value) return
-            text.value = String(value)
-            resumeText()
+        updateText,
+        {
+            flush: "sync",
         },
-        { immediate: true, flush: "sync" },
     )
+
+    /**
+     * Update the value ref from the text ref
+     */
+    function updateValue(): void {
+        const newText = text.value
+        pauseValue()
+        const num = Number(newText)
+        if (isNaN(num)) return
+        value.value = num
+        resumeValue()
+    }
+
+    /**
+     * Update the text ref from the value ref
+     */
+    function updateText(): void {
+        const newValue = value.value
+        pauseText()
+        if (Number(text.value) == newValue) return
+        text.value = String(newValue)
+        resumeText()
+    }
+
+    onMounted(updateText)
 </script>
 
 <template>
