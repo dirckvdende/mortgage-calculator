@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    import { computed, ref, watch, type Ref } from "vue"
+    import { computed, ref } from "vue"
     import InputField from "@/components/InputField.vue"
     import type { FieldNameAnnuity } from "@/util/FieldName"
     import {
@@ -8,80 +8,67 @@
         getMortgage,
         getYearsOfLoan,
     } from "@/util/annuity"
+    import { useRotatingSync } from "@/composables/useRotatingSync"
 
     const mortgage = ref<number | null>(100_000)
     const interest = ref<number | null>(3)
-    const interestFraction = computed(() => {
-        if (interest.value == null) return null
-        return interest.value / 100
-    })
     const years = ref<number | null>(30)
-    const monthlyCost = ref<number | null>(0)
+    const monthlyCost = ref<number | null>(1)
 
     const lockedField = ref<FieldNameAnnuity>("monthly-cost")
+    const lockedFieldCamelCase = computed<
+        "mortgage" | "interest" | "years" | "monthlyCost"
+    >(() => {
+        if (lockedField.value == "monthly-cost") return "monthlyCost"
+        return lockedField.value
+    })
 
-    function updateFields(): void {
-        let dependencies: [number | null, number | null, number | null] = [
-            null,
-            null,
-            null,
-        ]
-        let func: (x: number, y: number, z: number) => number | null = () =>
-            null
-        let target: Ref<number | null> = ref(0)
-
-        if (lockedField.value == "mortgage") {
-            dependencies = [
-                interestFraction.value,
-                years.value,
-                monthlyCost.value,
-            ]
-            func = getMortgage
-            target = mortgage
+    function runIfNotNull(
+        func: (x: number, y: number, z: number) => number | null,
+    ): (x: number | null, y: number | null, z: number | null) => number | null {
+        return (x, y, z) => {
+            if (x == null || y == null || z == null) return null
+            return func(x, y, z)
         }
-        if (lockedField.value == "interest") {
-            dependencies = [mortgage.value, years.value, monthlyCost.value]
-            func = getInterest
-            target = interest
-        }
-        if (lockedField.value == "years") {
-            dependencies = [
-                mortgage.value,
-                interestFraction.value,
-                monthlyCost.value,
-            ]
-            func = getYearsOfLoan
-            target = years
-        }
-        if (lockedField.value == "monthly-cost") {
-            dependencies = [mortgage.value, interestFraction.value, years.value]
-            func = getMonthlyCost
-            target = monthlyCost
-        }
-
-        for (const dep of dependencies) if (dep == null) return
-
-        target.value = func(...(dependencies as [number, number, number]))
     }
 
-    function updateIfUnlocked(
-        r: Ref<number | null>,
-        field: FieldNameAnnuity,
-    ): void {
-        watch(
-            [r, lockedField],
-            ([_, lockedField]) => {
-                if (lockedField == field) return
-                updateFields()
+    useRotatingSync(
+        {
+            mortgage,
+            interest,
+            years,
+            monthlyCost,
+        },
+        lockedFieldCamelCase,
+        {
+            mortgage: ({ interest, years, monthlyCost }) =>
+                runIfNotNull(getMortgage)(
+                    interest.value != null ? interest.value / 100 : null,
+                    years.value,
+                    monthlyCost.value,
+                ),
+            interest: ({ mortgage, years, monthlyCost }) => {
+                const result = runIfNotNull(getInterest)(
+                    mortgage.value,
+                    years.value,
+                    monthlyCost.value,
+                )
+                return result != null ? result * 100 : null
             },
-            { immediate: true, flush: "sync" },
-        )
-    }
-
-    updateIfUnlocked(mortgage, "mortgage")
-    updateIfUnlocked(interest, "interest")
-    updateIfUnlocked(years, "years")
-    updateIfUnlocked(monthlyCost, "monthly-cost")
+            years: ({ mortgage, interest, monthlyCost }) =>
+                runIfNotNull(getYearsOfLoan)(
+                    mortgage.value,
+                    interest.value != null ? interest.value / 100 : null,
+                    monthlyCost.value,
+                ),
+            monthlyCost: ({ mortgage, interest, years }) =>
+                runIfNotNull(getMonthlyCost)(
+                    mortgage.value,
+                    interest.value != null ? interest.value / 100 : null,
+                    years.value,
+                ),
+        },
+    )
 </script>
 
 <template>
