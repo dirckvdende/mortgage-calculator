@@ -1,5 +1,6 @@
 import {
     onUnmounted,
+    toRef,
     toValue,
     watch,
     type MaybeRefOrGetter,
@@ -16,8 +17,7 @@ export function useRotatingSync<T extends Record<string, Ref<any>>>(
 ): { stop: () => void } {
     const stopWatchFunctions: (() => void)[] = []
 
-    function update(updatedValue: keyof T): void {
-        if (updatedValue == toValue(target)) return
+    function update(): void {
         refs[toValue(target)]!.value = transform[toValue(target)](refs)
     }
 
@@ -26,11 +26,20 @@ export function useRotatingSync<T extends Record<string, Ref<any>>>(
     }
 
     for (const key of Object.keys(refs)) {
-        const { stop: stopWatch } = watch(refs[key]!, () => update(key), {
-            immediate: true,
-        })
+        const { stop: stopWatch } = watch(
+            refs[key]!,
+            () => {
+                if (key == toValue(target)) return
+                update()
+            },
+            {
+                immediate: true,
+            },
+        )
         stopWatchFunctions.push(stopWatch)
     }
+    const { stop: stopTargetWatch } = watch(toRef(target), update)
+    stopWatchFunctions.push(stopTargetWatch)
 
     onUnmounted(stop)
 
