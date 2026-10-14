@@ -41,11 +41,12 @@
     function updateValue(): void {
         const newText = text.value
         pauseValue()
-        const num = Number(newText)
         if (newText == "-") {
             value.value = null
+            resumeValue()
             return
         }
+        const num = Number(newText)
         if (isNaN(num)) return
         value.value = num
         resumeValue()
