@@ -81,6 +81,22 @@ export function getMortgage(
     years: number,
     monthlyCost: number,
 ): number | null {
-    // TODO: Implement
-    return 4
+    if (interest < 0 || years < 1 || monthlyCost < 1) return null
+    const months = years * 12
+    const monthlyInterest = Math.pow(1 + interest, 1 / 12) - 1
+    let lo = 0
+    let hi = monthlyCost * months
+    while (hi - lo > 0.001) {
+        const mortgage = (lo + hi) / 2
+        let mortgageLeft = mortgage
+        for (let month = 0; month < months; month++) {
+            const currentInterest = mortgageLeft * monthlyInterest
+            if (currentInterest > monthlyCost) break
+            mortgageLeft -= monthlyCost - currentInterest
+            if (mortgageLeft < 0) break
+        }
+        if (mortgageLeft < 0) lo = mortgage
+        else hi = mortgage
+    }
+    return lo
 }
