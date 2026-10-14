@@ -23,7 +23,7 @@
                     {{ page }}
                 </button>
             </div>
-            <AppAnnuity v-if="activePage == 'annuity'" />
+            <AppAnnuity v-show="activePage == 'annuity'" />
         </div>
     </div>
 </template>
