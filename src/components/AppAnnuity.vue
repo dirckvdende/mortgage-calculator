@@ -4,69 +4,77 @@
     import type { FieldNameAnnuity } from "@/util/FieldName"
     import {
         getInterest,
-        getMonthlyCost,
         getMortgage,
-        getYearsOfLoan,
+        getYearlyPayment,
+        getYears,
     } from "@/util/annuity"
     import { useRotatingSync } from "@/composables/useRotatingSync"
+    import { applyIfNotNull } from "@/util/applyIfNotNull"
+    import { createRefObjectFn } from "@/util/createRefObjectFn"
 
     const mortgage = ref<number | null>(100_000)
     const interest = ref<number | null>(3)
     const years = ref<number | null>(30)
     const monthlyCost = ref<number | null>(1)
 
-    const lockedField = ref<FieldNameAnnuity>("monthly-cost")
-    const lockedFieldCamelCase = computed<
-        "mortgage" | "interest" | "years" | "monthlyCost"
-    >(() => {
-        if (lockedField.value == "monthly-cost") return "monthlyCost"
-        return lockedField.value
+    const yearlyPayment = computed({
+        get: () => (monthlyCost.value == null ? null : monthlyCost.value * 12),
+        set: (value: number | null) => {
+            if (value == null) {
+                monthlyCost.value = null
+                return
+            }
+            monthlyCost.value = value / 12
+        },
+    })
+    const interestFraction = computed({
+        get: () => (interest.value == null ? null : interest.value / 100),
+        set: (value: number | null) => {
+            if (value == null) {
+                interest.value = null
+                return
+            }
+            interest.value = value * 100
+        },
     })
 
-    function runIfNotNull(
-        func: (x: number, y: number, z: number) => number | null,
-    ): (x: number | null, y: number | null, z: number | null) => number | null {
-        return (x, y, z) => {
-            if (x == null || y == null || z == null) return null
-            return func(x, y, z)
-        }
-    }
+    const lockedField = ref<FieldNameAnnuity>("monthly-cost")
+    const lockedFieldCamelCase = computed<
+        "mortgage" | "interest" | "years" | "yearlyPayment"
+    >(() => {
+        if (lockedField.value == "monthly-cost") return "yearlyPayment"
+        return lockedField.value
+    })
 
     useRotatingSync(
         {
             mortgage,
-            interest,
+            interest: interestFraction,
             years,
-            monthlyCost,
+            yearlyPayment,
         },
         lockedFieldCamelCase,
         {
-            mortgage: ({ interest, years, monthlyCost }) =>
-                runIfNotNull(getMortgage)(
-                    interest.value != null ? interest.value / 100 : null,
-                    years.value,
-                    monthlyCost.value,
-                ),
-            interest: ({ mortgage, years, monthlyCost }) => {
-                const result = runIfNotNull(getInterest)(
-                    mortgage.value,
-                    years.value,
-                    monthlyCost.value,
-                )
-                return result != null ? result * 100 : null
-            },
-            years: ({ mortgage, interest, monthlyCost }) =>
-                runIfNotNull(getYearsOfLoan)(
-                    mortgage.value,
-                    interest.value != null ? interest.value / 100 : null,
-                    monthlyCost.value,
-                ),
-            monthlyCost: ({ mortgage, interest, years }) =>
-                runIfNotNull(getMonthlyCost)(
-                    mortgage.value,
-                    interest.value != null ? interest.value / 100 : null,
-                    years.value,
-                ),
+            mortgage: createRefObjectFn(
+                applyIfNotNull(getMortgage, {
+                    mortgage: 0,
+                }),
+            ),
+            interest: createRefObjectFn(
+                applyIfNotNull(getInterest, {
+                    interest: 0,
+                }),
+            ),
+            years: createRefObjectFn(
+                applyIfNotNull(getYears, {
+                    years: 0,
+                }),
+            ),
+            yearlyPayment: createRefObjectFn(
+                applyIfNotNull(getYearlyPayment, {
+                    yearlyPayment: 0,
+                }),
+            ),
         },
     )
 </script>
