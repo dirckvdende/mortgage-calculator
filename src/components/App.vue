@@ -1,6 +1,7 @@
 <script setup lang="ts">
     import { ref } from "vue"
     import AppAnnuity from "@/components/AppAnnuity.vue"
+    import AppLinear from "./AppLinear.vue"
 
     const activePage = ref<"annuity" | "linear">("annuity")
 </script>
@@ -24,6 +25,7 @@
                 </button>
             </div>
             <AppAnnuity v-show="activePage == 'annuity'" />
+            <AppLinear v-show="activePage == 'linear'" />
         </div>
     </div>
 </template>

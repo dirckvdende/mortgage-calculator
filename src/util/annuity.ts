@@ -43,7 +43,7 @@ export function getYearlyPayment(
  */
 export function getYears(problem: AnnuityMortgageProblem): number | null {
     const { mortgage, interest, yearlyPayment } = problem
-    if (mortgage < 0 || interest < 0 || yearlyPayment < 0) return null
+    if (mortgage < 0 || interest < 0 || yearlyPayment <= 0) return null
     if (interest == 0) return mortgage / yearlyPayment
     if (interest * mortgage >= yearlyPayment) return null
     return (
