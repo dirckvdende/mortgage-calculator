@@ -7,7 +7,7 @@
         getMortgage,
         getYearlyPayment,
         getYears,
-    } from "@/util/annuity"
+    } from "@/util/annuityMortgage"
     import { useRotatingSync } from "@/composables/useRotatingSync"
     import { applyIfNotNull } from "@/util/applyIfNotNull"
     import { createRefObjectFn } from "@/util/createRefObjectFn"
