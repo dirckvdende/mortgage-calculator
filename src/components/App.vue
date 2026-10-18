@@ -42,15 +42,21 @@
     body {
         margin: 0;
         font-family: "Ubuntu", sans-serif;
+
+        @media screen and (max-width: 600px) {
+            font-size: 0.9em;
+        }
     }
 
     .container {
         width: 100%;
         box-sizing: border-box;
-        padding: 5em 1em;
+        padding: 5em 2em 7em 2em;
         display: flex;
         flex-direction: column;
         align-items: center;
+        min-height: 100vh;
+        justify-content: center;
 
         & > div {
             display: flex;

@@ -110,6 +110,10 @@
         &:focus {
             border-color: #333;
         }
+
+        @media screen and (max-width: 500px) {
+            width: 10em;
+        }
     }
 
     .overlay {

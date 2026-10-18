@@ -38,7 +38,11 @@
             :disabled="locked"
             :round-digits="roundDigits"
         />
-        <LockButton @click="emit('request-lock')" :locked="locked" />
+        <LockButton
+            :class="$style.lock"
+            @click="emit('request-lock')"
+            :locked="locked"
+        />
     </div>
 </template>
 
@@ -69,5 +73,10 @@
         font-family: inherit;
         font-size: 1em;
         outline: none;
+        flex-shrink: 0;
+    }
+
+    .lock {
+        flex-shrink: 0;
     }
 </style>
