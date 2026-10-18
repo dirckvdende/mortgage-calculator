@@ -26,6 +26,14 @@
             </div>
             <AppAnnuity v-show="activePage == 'annuity'" />
             <AppLinear v-show="activePage == 'linear'" />
+            <div :class="$style.note">
+                This is not financial advice. This tool is only meant for
+                educational purposes. Calculations of mortgages can vary.<br /><br />
+                Source code is available on
+                <a href="https://github.com/dirckvdende/mortgage-calculator"
+                    >GitHub</a
+                >.
+            </div>
         </div>
     </div>
 </template>
@@ -84,6 +92,21 @@
             &:hover {
                 opacity: 0.9;
             }
+        }
+    }
+
+    .note {
+        max-width: 30em;
+        padding: 0 2em;
+        box-sizing: border-box;
+        margin: 2em auto;
+        font-size: 0.8em;
+        color: #666;
+        text-align: center;
+
+        a {
+            color: inherit;
+            text-decoration: underline;
         }
     }
 </style>
