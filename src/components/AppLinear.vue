@@ -87,7 +87,7 @@
             v-model:value="mortgage"
             :locked="lockedField == 'mortgage'"
             @request-lock="lockedField = 'mortgage'"
-            prefix="$"
+            prefix="€"
             :round-digits="0"
         />
         <InputField
@@ -110,7 +110,7 @@
             v-model:value="monthlyCost"
             :locked="lockedField == 'initial-monthly-cost'"
             @request-lock="lockedField = 'initial-monthly-cost'"
-            prefix="$"
+            prefix="€"
             :round-digits="0"
         />
     </div>

@@ -7,7 +7,7 @@ const INTEREST_MAX_ITERATIONS = 1000
  * the four fields.
  */
 export type AnnuityMortgageProblem = {
-    /** The total mortgage in $ */
+    /** The total mortgage in € */
     mortgage: number
     /** The interest to pay per year as fraction (i.e. 3% = 0.03) */
     interest: number
