@@ -90,6 +90,7 @@
             transition: opacity 0.1s;
             user-select: none;
             outline: none;
+            -webkit-tap-highlight-color: transparent;
 
             &.active {
                 background-color: #333;

@@ -44,6 +44,7 @@
         font-size: 1em;
         user-select: none;
         outline: none;
+        -webkit-tap-highlight-color: transparent;
         transition:
             background-color 0.1s,
             color 0.1s;
