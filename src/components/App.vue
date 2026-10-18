@@ -89,6 +89,7 @@
             cursor: pointer;
             transition: opacity 0.1s;
             user-select: none;
+            outline: none;
 
             &.active {
                 background-color: #333;
